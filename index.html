@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Tracker</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f8f9fc;
+      color: #333;
+      padding: 40px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 36px;
+      color: #4a4a4a;
+    }
+
+    .form-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: space-between;
+      max-width: 100%;
+      margin-bottom: 30px;
+      background: #fff;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    .form-group {
+      flex: 1 1 30%;
+      min-width: 250px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    input, select, button {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #fff;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #6c63ff;
+      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+    }
+
+    button {
+      background-color: #6c63ff;
+      color: white;
+      font-weight: bold;
+      border: none;
+      margin-top: auto;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #5848e5;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      padding: 16px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+      font-size: 16px;
+    }
+
+    th {
+      background-color: #f1f3f9;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .btn-replied {
+      background-color: #28c76f;
+      padding: 8px 14px;
+      font-size: 14px;
+      border-radius: 6px;
+      color: white;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn-replied:hover {
+      background-color: #20b15a;
+    }
+
+    @media(max-width: 768px) {
+      .form-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>📋 Chat Tracker</h1>
+  </div>
+
+  <div class="form-container">
+    <div class="form-group">
+      <label for="vipName">VIP Manager Name</label>
+      <input type="text" id="vipName" placeholder="e.g. Rakesh">
+    </div>
+
+    <div class="form-group">
+      <label for="platform">Platform</label>
+      <select id="platform">
+        <option>WhatsApp</option>
+        <option>Telegram</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="remark">Remark</label>
+      <input type="text" id="remark" placeholder="Enter notes or issues">
+    </div>
+
+    <div class="form-group" style="align-self: flex-end;">
+      <button onclick="addChat()">➕ Add Chat</button>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>VIP</th>
+        <th>Platform</th>
+        <th>Remark</th>
+        <th>Start Time</th>
+        <th>Stopwatch</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="chatList"></tbody>
+  </table>
+
+  <script>
+    function formatTime(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      return `${minutes}:${seconds}`;
+    }
+
+    function addChat() {
+      const vip = document.getElementById('vipName').value.trim();
+      const platform = document.getElementById('platform').value;
+      const remark = document.getElementById('remark').value.trim();
+      if (!vip || !remark) return alert('Please enter VIP name and remark');
+
+      const now = new Date();
+      const row = document.createElement('tr');
+
+      const stopwatchCell = document.createElement('td');
+      let startTime = Date.now();
+      stopwatchCell.textContent = '00:00';
+
+      const interval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        stopwatchCell.textContent = formatTime(elapsed);
+      }, 1000);
+
+      const actionCell = document.createElement('td');
+      const doneBtn = document.createElement('button');
+      doneBtn.textContent = '✔ Replied';
+      doneBtn.className = 'btn-replied';
+      doneBtn.onclick = () => {
+        clearInterval(interval);
+        row.remove();
+      };
+      actionCell.appendChild(doneBtn);
+
+      row.innerHTML = `
+        <td>${vip}</td>
+        <td>${platform}</td>
+        <td>${remark}</td>
+        <td>${now.toLocaleTimeString()}</td>
+      `;
+      row.appendChild(stopwatchCell);
+      row.appendChild(actionCell);
+
+      document.getElementById('chatList').appendChild(row);
+
+      document.getElementById('vipName').value = '';
+      document.getElementById('remark').value = '';
+    }
+  </script>
+
+</body>
+</html>
