@@ -170,8 +170,20 @@
       </select>
     </div>
     <div>
-      <label for="remark">Remark</label>
-      <input type="text" id="remark" placeholder="Enter notes or issues">
+      <label for="remarkSelect">Remark</label>
+      <select id="remarkSelect" onchange="toggleCustomRemark(this)">
+        <option value="">-- Select Remark --</option>
+        <option>Welcome / Greeting</option>
+        <option>Voucher Update</option>
+        <option>Voucher Chek</option>
+        <option>Withdrawal Related</option>
+        <option>Deposit Related</option>
+        <option>VIP Manager change</option>
+        <option>Security Escalation</option>
+        <option>Technical Issue</option>
+        <option value="custom">Other</option>
+      </select>
+      <input type="text" id="customRemark" placeholder="Enter custom remark" style="display:none; margin-top: 10px;" />
     </div>
     <div>
       <label for="clientId">Client ID</label>
@@ -202,8 +214,13 @@
   <script>
     let chatCounts = {};
     let trackedClients = new Set();
-    let countedClients = new Set(); // ✅ Only count once per VIP+Platform+Client
+    let countedClients = new Set();
     let activeRows = new Map();
+
+    function toggleCustomRemark(selectEl) {
+      const customInput = document.getElementById('customRemark');
+      customInput.style.display = selectEl.value === 'custom' ? 'block' : 'none';
+    }
 
     function showAlert(message) {
       const alertBox = document.getElementById('alertBox');
@@ -233,7 +250,10 @@
     function addChat() {
       const vip = document.getElementById('vipName').value.trim();
       const platform = document.getElementById('platform').value.trim();
-      const remark = document.getElementById('remark').value.trim();
+      const remarkSelect = document.getElementById('remarkSelect');
+      const remark = remarkSelect.value === 'custom'
+        ? document.getElementById('customRemark').value.trim()
+        : remarkSelect.value.trim();
       const clientId = document.getElementById('clientId').value.trim();
 
       if (!vip || !remark || !clientId) {
@@ -242,7 +262,6 @@
       }
 
       const countKey = `${vip.toLowerCase()}-${clientId.toLowerCase()}-${platform.toLowerCase()}`;
-
       const vipList = document.getElementById('vipList');
       if (![...vipList.options].some(opt => opt.value === vip)) {
         const option = document.createElement('option');
@@ -292,7 +311,7 @@
         clearInterval(interval);
         row.remove();
         activeRows.delete(countKey);
-        trackedClients.delete(countKey); // allow re-adding later
+        trackedClients.delete(countKey);
       };
       actionCell.appendChild(doneBtn);
 
@@ -310,8 +329,11 @@
       activeRows.set(countKey, row);
       row.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
+      // Reset fields
       document.getElementById('vipName').value = '';
-      document.getElementById('remark').value = '';
+      document.getElementById('remarkSelect').value = '';
+      document.getElementById('customRemark').value = '';
+      document.getElementById('customRemark').style.display = 'none';
       document.getElementById('clientId').value = '';
     }
   </script>
