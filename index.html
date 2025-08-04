@@ -1125,6 +1125,61 @@ Break: (00:00 AM – 00:00 AM IST)`
     populateSubcategoryDropdown();
     renderMessages();
   </script>
+
+<!-- 🔔 Alarm System -->
+<audio id="alarmSound" loop>
+  <source src="loudest_alarm.mp3" type="audio/mpeg" />
+  Your browser does not support the audio element.
+</audio>
+
+<!-- 🔔 Alarm Box -->
+<div id="alarmBox" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#ffe5e5; padding:20px 30px; border:2px solid red; z-index:9999; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.2); text-align:center;">
+  <strong style="font-size:18px;">🔔 30 minutes are over!</strong>
+  <br><br>
+  <button onclick="stopAlarm()" style="padding:10px 20px; background:red; color:white; border:none; border-radius:6px; font-size:16px; cursor:pointer;">Stop Alarm</button>
+</div>
+
+<!-- ⏳ Countdown Display -->
+<div id="countdownBox" style="position:fixed; bottom:20px; right:20px; background:#e8f0ff; padding:10px 15px; border:1px solid #4e8cff; border-radius:8px; font-size:16px; color:#2457ff; box-shadow:0 2px 8px rgba(0,0,0,0.1); z-index:999;">
+  ⏳ Next alarm in: <span id="countdown">30:00</span>
+</div>
+
+<script>
+  const alarmSound = document.getElementById("alarmSound");
+  const alarmBox = document.getElementById("alarmBox");
+  const countdownDisplay = document.getElementById("countdown");
+
+  let alarmInterval = 30 * 60; // 30 minutes in seconds
+  let currentCountdown = alarmInterval;
+
+  function updateCountdown() {
+    let mins = Math.floor(currentCountdown / 60);
+    let secs = currentCountdown % 60;
+    countdownDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    currentCountdown--;
+
+    if (currentCountdown < 0) {
+      startAlarm();
+      currentCountdown = alarmInterval; // reset timer
+    }
+  }
+
+  function startAlarm() {
+    alarmBox.style.display = "block";
+    alarmSound.play();
+  }
+
+  function stopAlarm() {
+    alarmSound.pause();
+    alarmSound.currentTime = 0;
+    alarmBox.style.display = "none";
+  }
+
+  // Start countdown ticking every second
+  setInterval(updateCountdown, 1000);
+</script>
+
 </body>
 </html>
+
 
